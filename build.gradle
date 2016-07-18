@@ -1,0 +1,92 @@
+
+plugins {
+    id "com.jfrog.bintray" version "1.6"
+}
+
+allprojects {
+    apply plugin: "maven-publish"
+    group = 'nl.weeaboo.gdx-test'
+    version = '1.0.0'
+    
+    repositories {
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    }    
+}
+
+subprojects {
+    apply plugin: "eclipse"
+    apply plugin: "idea"
+    apply plugin: "java"
+    
+    ext {
+        gdxVersion = '1.9.3'
+        junitVersion = '4.12'
+    }
+    
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+    compileJava.options.encoding = 'UTF-8'
+    compileTestJava.options.encoding = 'UTF-8'
+    
+	dependencies {
+    	testCompile "junit:junit:$junitVersion"
+    }
+    
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allJava
+        classifier "sources"
+    }
+}
+
+project(":gdx-test-util") {
+	dependencies {
+        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+                        
+    	testCompile "junit:junit:$junitVersion"
+    }
+}
+
+project(":gdx-test-junit") {
+    dependencies {
+        compile project(':gdx-test-util')
+        runtime "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        
+    	compile "junit:junit:$junitVersion"
+    }
+}
+
+publishing {
+    publications {
+        util(MavenPublication) {
+            artifactId = 'gdx-test-util'
+
+            def proj = project(":gdx-test-util")
+            from proj.components.java            
+            artifact(proj.sourceJar)            
+        }
+        impl(MavenPublication) {
+            artifactId = 'gdx-test-junit'
+
+            def proj = project(":gdx-test-junit")
+            from proj.components.java            
+            artifact(proj.sourceJar)            
+        }
+    }
+}
+
+bintray {	
+	user = System.getenv('BINTRAY_USER')
+	key = System.getenv('BINTRAY_KEY')
+	publications = ['util', 'junit']
+	pkg {
+		repo = 'gdx'
+		name = 'gdx-test'
+		licenses = ['Apache-2.0']
+		vcsUrl = 'https://github.com/anonl/gdx-test.git'
+        version {
+            name = project.version
+        }
+    }
+}
