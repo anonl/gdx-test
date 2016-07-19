@@ -39,18 +39,10 @@ subprojects {
     }
 }
 
-project(":gdx-test-util") {
-	dependencies {
+project(":gdx-test-core") {
+    dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-                        
-    	testCompile "junit:junit:$junitVersion"
-    }
-}
-
-project(":gdx-test-junit") {
-    dependencies {
-        compile project(':gdx-test-util')
         runtime "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         
     	compile "junit:junit:$junitVersion"
@@ -59,17 +51,10 @@ project(":gdx-test-junit") {
 
 publishing {
     publications {
-        util(MavenPublication) {
-            artifactId = 'gdx-test-util'
+        core(MavenPublication) {
+            artifactId = 'gdx-test-core'
 
-            def proj = project(":gdx-test-util")
-            from proj.components.java            
-            artifact(proj.sourceJar)            
-        }
-        impl(MavenPublication) {
-            artifactId = 'gdx-test-junit'
-
-            def proj = project(":gdx-test-junit")
+            def proj = project(":gdx-test-core")
             from proj.components.java            
             artifact(proj.sourceJar)            
         }
@@ -79,7 +64,7 @@ publishing {
 bintray {	
 	user = System.getenv('BINTRAY_USER')
 	key = System.getenv('BINTRAY_KEY')
-	publications = ['util', 'junit']
+	publications = ['core']
 	pkg {
 		repo = 'gdx'
 		name = 'gdx-test'

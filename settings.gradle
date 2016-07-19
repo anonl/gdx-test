@@ -1,6 +1,3 @@
 
-include ':gdx-test-util'
-project(':gdx-test-util').projectDir=new File('util')
-
-include ':gdx-test-junit'
-project(':gdx-test-junit').projectDir=new File('junit')
+include ':gdx-test-core'
+project(':gdx-test-core').projectDir=new File('core')
