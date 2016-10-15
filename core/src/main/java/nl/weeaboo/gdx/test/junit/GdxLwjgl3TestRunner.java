@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.internal.runners.model.EachTestNotifier;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -52,6 +53,15 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
         }
     }
 
+    @Override
+    protected void runChild(FrameworkMethod method, RunNotifier notifier) {
+        // Clear backbuffer between tests
+        Gdx.gl.glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | GL20.GL_STENCIL_BUFFER_BIT);
+
+        super.runChild(method, notifier);
+    }
+
     private void runInRenderThread(final Runnable runner) throws InterruptedException {
         final Semaphore initLock = new Semaphore(0);
         final Semaphore runLock = new Semaphore(0);
@@ -84,10 +94,6 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
 
                     @Override
                     public void render() {
-                        // Clear backbuffer between tests
-                        Gdx.gl.glClearColor(0, 0, 0, 0);
-                        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | GL20.GL_STENCIL_BUFFER_BIT);
-
                         try {
                             runner.run();
                         } finally {
