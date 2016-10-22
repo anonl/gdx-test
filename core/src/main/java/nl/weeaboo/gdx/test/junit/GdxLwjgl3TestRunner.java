@@ -84,6 +84,7 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
             public void run() {
                 Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
                 config.disableAudio(DISABLE_AUDIO);
+                config.setInitialVisible(false);
 
                 @SuppressWarnings("unused")
                 Lwjgl3Application app = new Lwjgl3Application(new ApplicationAdapter() {
