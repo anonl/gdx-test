@@ -18,13 +18,13 @@ public class ExceptionTester {
             }
         });
     }
-    public <T> T expect(Class<? extends Exception> expected, Callable<T> callable) {
+
+    public void expect(Class<? extends Exception> expected, Callable<?> callable) {
         try {
-            return callable.call();
+            callable.call();
+            throw new AssertionError("Expected an exception");
         } catch (Exception e) {
-            if (expected.isInstance(e)) {
-                return null;
-            } else {
+            if (!expected.isInstance(e)) {
                 throw new AssertionError(e);
             }
         }
