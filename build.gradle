@@ -29,8 +29,8 @@ subprojects {
     compileJava.options.encoding = 'UTF-8'
     compileTestJava.options.encoding = 'UTF-8'
     
-	dependencies {
-    	testCompile "junit:junit:$junitVersion"
+    dependencies {
+        testCompile "junit:junit:$junitVersion"
     }
     
     task sourceJar(type: Jar) {
@@ -45,7 +45,7 @@ project(":gdx-test-core") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         runtime "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         
-    	compile "junit:junit:$junitVersion"
+        compile "junit:junit:$junitVersion"
     }
 }
 
@@ -61,15 +61,15 @@ publishing {
     }
 }
 
-bintray {	
-	user = System.getenv('BINTRAY_USER')
-	key = System.getenv('BINTRAY_KEY')
-	publications = ['core']
-	pkg {
-		repo = 'gdx'
-		name = 'gdx-test'
-		licenses = ['Apache-2.0']
-		vcsUrl = 'https://github.com/anonl/gdx-test.git'
+bintray {    
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['core']
+    pkg {
+        repo = 'gdx'
+        name = 'gdx-test'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/anonl/gdx-test.git'
         version {
             name = project.version
         }
