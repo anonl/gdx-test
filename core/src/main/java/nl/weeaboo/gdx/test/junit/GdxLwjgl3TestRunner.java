@@ -18,7 +18,6 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3NativesLoader;
 import com.badlogic.gdx.graphics.GL20;
 
 public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
@@ -67,19 +66,11 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
         final Semaphore runLock = new Semaphore(0);
 
         /*
-         * Workaround for libGDX issue; GLFW context is terminated upon shutdown, but not reinitialized when
-         * creating a new application
-         */
-        Lwjgl3NativesLoader.load();
-        GLFWErrorCallback errorCallback = GLFWErrorCallback.createPrint(System.err);
-        GLFW.glfwSetErrorCallback(errorCallback);
-        GLFW.glfwInit();
-
-        /*
          * Workaround for libGDX issue; Lwjgl3Application constructor contains an infinite loop (lolwut), so
          * we have to create it in a background thread.
          */
         final Thread initThread = new Thread(new Runnable() {
+
             @Override
             public void run() {
                 Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
@@ -102,6 +93,10 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
                         }
                     }
                 }, config);
+
+                GLFW.nglfwSetErrorCallback(0L);
+                GLFW.glfwInit();
+                GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
             }
         });
         initThread.start();
