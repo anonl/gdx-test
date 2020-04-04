@@ -70,7 +70,7 @@ bintray {
     key = System.getenv('BINTRAY_KEY')
     publications = ['core']
     pkg {
-        repo = 'gdx'
+        repo = 'nvlist'
         name = 'gdx-test'
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/anonl/gdx-test.git'
