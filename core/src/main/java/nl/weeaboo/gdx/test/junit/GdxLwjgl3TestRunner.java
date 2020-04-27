@@ -18,6 +18,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.graphics.GL20;
 
 public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
@@ -77,6 +79,10 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
                 config.disableAudio(DISABLE_AUDIO);
                 config.setInitialVisible(false);
 
+                GLFW.nglfwSetErrorCallback(0L);
+                GLFW.glfwInit();
+                GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
+
                 @SuppressWarnings("unused")
                 Lwjgl3Application app = new Lwjgl3Application(new ApplicationAdapter() {
                     @Override
@@ -86,17 +92,15 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
 
                     @Override
                     public void render() {
+                        Lwjgl3Window window = ((Lwjgl3Graphics)Gdx.graphics).getWindow();
                         try {
                             runner.run();
+                            window.closeWindow();
                         } finally {
                             runLock.release();
                         }
                     }
                 }, config);
-
-                GLFW.nglfwSetErrorCallback(0L);
-                GLFW.glfwInit();
-                GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
             }
         });
         initThread.start();
