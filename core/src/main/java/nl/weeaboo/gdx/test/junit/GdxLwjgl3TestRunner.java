@@ -79,10 +79,6 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
                 config.disableAudio(DISABLE_AUDIO);
                 config.setInitialVisible(false);
 
-                GLFW.nglfwSetErrorCallback(0L);
-                GLFW.glfwInit();
-                GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
-
                 @SuppressWarnings("unused")
                 Lwjgl3Application app = new Lwjgl3Application(new ApplicationAdapter() {
                     @Override
@@ -101,6 +97,10 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
                         }
                     }
                 }, config);
+
+                GLFW.nglfwSetErrorCallback(0L);
+                GLFW.glfwInit();
+                GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
             }
         });
         initThread.start();
