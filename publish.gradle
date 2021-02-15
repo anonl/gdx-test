@@ -30,13 +30,13 @@ publishing {
             pom {
                 groupId = project.group
                 name = project.name
-                description = 'Fork of LuaJ with added serialization support'
-                url = 'https://github.com/anonl/LuaJPP2'
+                description = 'JUnit test runners and other testing utilities for libGDX projects'
+                url = 'https://github.com/anonl/gdx-test'
                 from components.java
                 licenses {
                     license {
-                        name = 'MIT License'
-                        url = 'https://opensource.org/licenses/mit-license.php'
+                        name = 'Apache License, Version 2.0'
+                        url = 'https://opensource.org/licenses/Apache-2.0'
                     }
                 }
                 developers {
@@ -46,9 +46,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git://github.com/anonl/luajpp2.git'
-                    developerConnection = 'scm:git:ssh://github.com:anonl/luajpp2.git'
-                    url = 'https://github.com/anonl/luajpp2'
+                    connection = 'scm:git://github.com/anonl/gdx-test.git'
+                    developerConnection = 'scm:git:ssh://github.com:anonl/gdx-test.git'
+                    url = 'https://github.com/anonl/gdx-test'
                 }
             }
         }
