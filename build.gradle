@@ -1,25 +1,20 @@
 
-plugins {
-    id 'com.jfrog.bintray' version '1.7.3'
-}
-
 allprojects {
-    apply plugin: 'maven-publish'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+
     group = 'nl.weeaboo.gdx-test'
     version = '2.0.2'
     
     repositories {
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-    }    
+    }
 }
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
-    apply plugin: 'eclipse'
-    apply plugin: 'idea'
-    
+
     ext {
         javaVersion = JavaVersion.VERSION_1_6
 
@@ -35,47 +30,5 @@ subprojects {
     
     dependencies {
         testCompile "junit:junit:$junitVersion"
-    }
-    
-    task sourceJar(type: Jar) {
-        from sourceSets.main.allJava
-        classifier "sources"
-    }
-}
-
-project(":gdx-test-core") {
-    dependencies {
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-        runtime "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        
-        compile "junit:junit:$junitVersion"
-    }
-}
-
-publishing {
-    publications {
-        core(MavenPublication) {
-            artifactId = 'gdx-test-core'
-
-            def proj = project(":gdx-test-core")
-            from proj.components.java            
-            artifact(proj.sourceJar)            
-        }
-    }
-}
-
-bintray {    
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
-    publications = ['core']
-    pkg {
-        repo = 'nvlist'
-        name = 'gdx-test'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/anonl/gdx-test.git'
-        version {
-            name = project.version
-        }
     }
 }
