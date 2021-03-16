@@ -13,7 +13,6 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.system.Configuration;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
@@ -32,14 +31,10 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
 
     public GdxLwjgl3TestRunner(Class<?> klass) throws InitializationError {
         super(klass);
-
-        Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
     }
 
     @Override
     public void run(final RunNotifier notifier) {
-        System.out.println(getDescription());
-
         EachTestNotifier testNotifier = new EachTestNotifier(notifier, getDescription());
         if (GraphicsEnvironment.isHeadless()) {
             // Integration tests require a GL context, so they don't work in a headless env
