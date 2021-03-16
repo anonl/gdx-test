@@ -1,6 +1,7 @@
 package nl.weeaboo.gdx.test.junit;
 
 import java.awt.GraphicsEnvironment;
+import java.lang.reflect.Field;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -12,14 +13,13 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.system.Configuration;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.graphics.GL20;
 
 public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
@@ -32,10 +32,14 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
 
     public GdxLwjgl3TestRunner(Class<?> klass) throws InitializationError {
         super(klass);
+
+        Configuration.DEBUG_MEMORY_ALLOCATOR.set(true);
     }
 
     @Override
     public void run(final RunNotifier notifier) {
+        System.out.println(getDescription());
+
         EachTestNotifier testNotifier = new EachTestNotifier(notifier, getDescription());
         if (GraphicsEnvironment.isHeadless()) {
             // Integration tests require a GL context, so they don't work in a headless env
@@ -79,6 +83,9 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
                 config.disableAudio(DISABLE_AUDIO);
                 config.setInitialVisible(false);
 
+                GLFW.glfwInit();
+
+                // Note: This constructor call is blocking until the app exits (very odd design)
                 @SuppressWarnings("unused")
                 Lwjgl3Application app = new Lwjgl3Application(new ApplicationAdapter() {
                     @Override
@@ -88,19 +95,16 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
 
                     @Override
                     public void render() {
-                        Lwjgl3Window window = ((Lwjgl3Graphics)Gdx.graphics).getWindow();
+                        final Application app = Gdx.app;
                         try {
                             runner.run();
-                            window.closeWindow();
                         } finally {
+                            app.exit();
                             runLock.release();
                         }
                     }
                 }, config);
 
-                GLFW.nglfwSetErrorCallback(0L);
-                GLFW.glfwInit();
-                GLFW.glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
             }
         });
         initThread.start();
@@ -118,6 +122,21 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
             }
 
             initThread.join(30000);
+
+            preventCallbackCrash();
+        }
+    }
+
+    private static void preventCallbackCrash() {
+        // Workaround for crash: native code crash in Lwjgl3Application.initializeGlfw() > glfwSetErrorCallback
+        try {
+            Field field = Lwjgl3Application.class.getDeclaredField("errorCallback");
+            field.setAccessible(true);
+            field.set(null, GLFWErrorCallback.createPrint(System.err));
+        } catch (NoSuchFieldException e) {
+            throw new AssertionError("Workaround for glfwSetErrorCallback crash failed: " + e);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError("Workaround for glfwSetErrorCallback crash failed: " + e);
         }
     }
 
