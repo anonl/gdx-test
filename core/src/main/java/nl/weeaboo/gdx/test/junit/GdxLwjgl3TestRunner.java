@@ -83,6 +83,9 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
                 // Note: This constructor call is blocking until the app exits (very odd design)
                 @SuppressWarnings("unused")
                 Lwjgl3Application app = new Lwjgl3Application(new ApplicationAdapter() {
+
+                    boolean runStarted;
+
                     @Override
                     public void create() {
                         initLock.release();
@@ -90,6 +93,16 @@ public class GdxLwjgl3TestRunner extends BlockJUnit4ClassRunner {
 
                     @Override
                     public void render() {
+                        if (runStarted) {
+                            /*
+                             * The render method may be called multiple times. For example when changing the
+                             * display mode, the render method is called recursively.
+                             */
+                            return;
+                        }
+
+                        runStarted = true;
+
                         final Application app = Gdx.app;
                         try {
                             runner.run();
